@@ -101,7 +101,6 @@ function buildToolPath(name, args = {}) {
 
 function validateApiUrl(url) {
   const parsed = new URL(url);
-  if (process.env.KRONOS_ALLOW_LOCALHOST === "1" && ["127.0.0.1", "localhost"].includes(parsed.hostname)) return parsed.origin;
   if (parsed.origin !== ALLOWED_API_ORIGIN) throw new Error(`KRONOS_API_URL must use ${ALLOWED_API_ORIGIN}`);
   return parsed.origin;
 }

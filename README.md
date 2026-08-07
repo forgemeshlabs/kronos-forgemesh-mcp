@@ -17,11 +17,10 @@ Base. This is the agent client layer for the third Kronos product origin.
 | `audit_kronos_decision` | Outcome audit for a prior `decision_id` | $0.07 |
 | `create_kronos_decision` | Auditable market-intelligence journal | $0.15 |
 
-## Run locally
+## Install
 
 ```bash
-npm install
-WALLET_PRIVATE_KEY=0x<dedicated-low-balance-wallet-key> npm start
+npx -y kronos-forgemesh-mcp
 ```
 
 The private key stays local and is used only to sign x402 payment
@@ -35,8 +34,8 @@ production API origin.
 {
   "mcpServers": {
     "kronos": {
-      "command": "node",
-      "args": ["/home/ubuntu/dev/kronos-mcp/index.js"],
+      "command": "npx",
+      "args": ["-y", "kronos-forgemesh-mcp"],
       "env": {
         "WALLET_PRIVATE_KEY": "0x<dedicated-low-balance-wallet-key>"
       }
@@ -53,4 +52,6 @@ after 60 seconds. Errors are returned as structured `KRONOS_TOOL_ERROR`
 payloads so the calling agent can recover without reading server logs.
 
 Market intelligence only. Outputs are not instructions to transact.
+
+Source: https://github.com/forgemeshlabs/kronos-forgemesh-mcp
 

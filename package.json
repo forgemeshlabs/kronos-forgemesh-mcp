@@ -1,12 +1,13 @@
 {
   "name": "kronos-forgemesh-mcp",
   "version": "0.1.0",
+  "mcpName": "io.github.forgemeshlabs/kronos-forgemesh-mcp",
   "description": "MCP server for Kronos by ForgeMesh market intelligence with automatic x402 payments",
   "main": "index.js",
   "bin": {
     "kronos-forgemesh-mcp": "index.js"
   },
-  "files": ["index.js", "README.md", "server.json", "CHANGELOG.md", "LICENSE"],
+  "files": ["index.js", "README.md", "server.json", "CHANGELOG.md", "SECURITY.md", "LICENSE"],
   "scripts": {
     "start": "node index.js",
     "test": "node --test test/*.test.js",
@@ -17,6 +18,13 @@
   "author": "ForgeMesh Labs",
   "license": "MIT",
   "homepage": "https://kronos.forgemesh.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/forgemeshlabs/kronos-forgemesh-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/forgemeshlabs/kronos-forgemesh-mcp/issues"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
     "@x402/core": "2.11.0",
