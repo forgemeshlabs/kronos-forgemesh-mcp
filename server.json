@@ -1,0 +1,24 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.forgemeshlabs/kronos-forgemesh-mcp",
+  "description": "Kronos by ForgeMesh market intelligence with calibrated ranges, risk context, outcome audits, and x402 payments on Base.",
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "kronos-forgemesh-mcp",
+      "version": "0.1.0",
+      "transport": { "type": "stdio" },
+      "environmentVariables": [
+        {
+          "name": "WALLET_PRIVATE_KEY",
+          "description": "Dedicated low-balance Base wallet private key for x402 USDC payments.",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}
+
