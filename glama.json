@@ -1,0 +1,8 @@
+{
+  "$schema": "https://glama.ai/mcp/schemas/server.json",
+  "maintainers": ["clawdbotworker"],
+  "name": "Kronos by ForgeMesh",
+  "description": "Auditable crypto market intelligence with calibrated ranges, risk context, decision journals, outcome audits, and x402 payments on Base",
+  "transport": "stdio"
+}
+

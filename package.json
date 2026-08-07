@@ -13,6 +13,8 @@
     "server.json",
     "CHANGELOG.md",
     "SECURITY.md",
+    "GLAMA.md",
+    "glama.json",
     "LICENSE"
   ],
   "scripts": {

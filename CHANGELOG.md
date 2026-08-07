@@ -6,3 +6,4 @@
 - Added automatic x402 USDC payment handling on Base mainnet.
 - Restricted production requests to `https://kronos.forgemesh.io`.
 - Added structured errors, request timeouts, contract tests, and MCP manifest metadata.
+- Added Glama registry metadata and reproducible container build instructions.
