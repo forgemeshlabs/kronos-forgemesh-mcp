@@ -1,5 +1,5 @@
 {
-  "name": "kronos-forgemesh-mcp",
+  "name": "@forgemeshlabs/kronos-forgemesh-mcp",
   "version": "0.1.0",
   "mcpName": "io.github.forgemeshlabs/kronos-forgemesh-mcp",
   "description": "MCP server for Kronos by ForgeMesh market intelligence with automatic x402 payments",

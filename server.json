@@ -10,7 +10,7 @@
   "packages": [
     {
       "registryType": "npm",
-      "identifier": "kronos-forgemesh-mcp",
+      "identifier": "@forgemeshlabs/kronos-forgemesh-mcp",
       "version": "0.1.0",
       "transport": { "type": "stdio" },
       "environmentVariables": [
@@ -25,4 +25,3 @@
     }
   ]
 }
-

@@ -20,7 +20,7 @@ Base. This is the agent client layer for the third Kronos product origin.
 ## Install
 
 ```bash
-npx -y kronos-forgemesh-mcp
+npx -y @forgemeshlabs/kronos-forgemesh-mcp
 ```
 
 The private key stays local and is used only to sign x402 payment
@@ -35,7 +35,7 @@ production API origin.
   "mcpServers": {
     "kronos": {
       "command": "npx",
-      "args": ["-y", "kronos-forgemesh-mcp"],
+      "args": ["-y", "@forgemeshlabs/kronos-forgemesh-mcp"],
       "env": {
         "WALLET_PRIVATE_KEY": "0x<dedicated-low-balance-wallet-key>"
       }
@@ -54,4 +54,3 @@ payloads so the calling agent can recover without reading server logs.
 Market intelligence only. Outputs are not instructions to transact.
 
 Source: https://github.com/forgemeshlabs/kronos-forgemesh-mcp
-
