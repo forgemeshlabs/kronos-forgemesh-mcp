@@ -18,16 +18,34 @@ const ALLOWED_API_ORIGIN = "https://kronos.forgemesh.io";
 const TOOLS = [
   {
     name: "get_kronos_signals",
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
     description: "Get current Kronos signal context and ranked symbols for BTC, ETH, SOL, XRP, and ADA. Costs $0.05 USDC.",
     inputSchema: { type: "object", additionalProperties: false, properties: {} },
   },
   {
     name: "get_kronos_risk",
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
     description: "Get current Kronos market-risk state, signal streaks, and cooldown context. Costs $0.02 USDC.",
     inputSchema: { type: "object", additionalProperties: false, properties: {} },
   },
   {
     name: "get_kronos_history",
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
     description: "Get up to 168 hours of timestamped Kronos signal history for analysis and audit support. Costs $0.05 USDC.",
     inputSchema: {
       type: "object", additionalProperties: false,
@@ -36,6 +54,12 @@ const TOOLS = [
   },
   {
     name: "get_kronos_forecast",
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
     description: "Get a conformally calibrated 80% price range, current price, and upside probability for a supported symbol. Costs $0.05 USDC.",
     inputSchema: {
       type: "object", additionalProperties: false,
@@ -44,6 +68,12 @@ const TOOLS = [
   },
   {
     name: "check_kronos_preflight",
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
     description: "Check market state, cooldowns, freshness, and warnings before creating a Kronos decision journal. Costs $0.05 USDC.",
     inputSchema: {
       type: "object", additionalProperties: false,
@@ -53,6 +83,12 @@ const TOOLS = [
   },
   {
     name: "create_kronos_decision",
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
     description: "Create an auditable Kronos market-intelligence journal entry with directional bias, calibrated confidence, and decision_id. Costs $0.15 USDC.",
     inputSchema: {
       type: "object", additionalProperties: false,
@@ -62,6 +98,12 @@ const TOOLS = [
   },
   {
     name: "audit_kronos_decision",
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
     description: "Audit a prior Kronos decision_id against later prices and return its outcome verdict. Costs $0.07 USDC.",
     inputSchema: {
       type: "object", additionalProperties: false,
@@ -74,6 +116,12 @@ const TOOLS = [
   },
   {
     name: "get_kronos_whale_flows",
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
     description: "Get whale, exchange, bridge, and stablecoin-flow context for Ethereum, Base, or Arbitrum. Costs $0.02 USDC.",
     inputSchema: {
       type: "object", additionalProperties: false,
