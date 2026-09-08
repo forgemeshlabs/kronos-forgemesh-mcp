@@ -6,6 +6,16 @@ An MCP stdio server that lets agents purchase structured Kronos market
 intelligence from `https://kronos.forgemesh.io` using x402 USDC payments on
 Base. This is the agent client layer for the third Kronos product origin.
 
+## Build your own Kronos
+
+Want to build your own Kronos market-intelligence and paper-trading system
+instead of calling this one? The **Kronos Field Guide** is the ebook + coding-agent
+build package we kept being asked for: two learning paths, 81 explained
+configuration fields, the documented failures of our own paper setup, and two
+self-contained briefs you hand to Claude Code, Codex or Cursor.
+https://forgemesh.io/kronos/field-guide — educational only, not financial
+advice, no support of any kind.
+
 ## Tools
 
 | Tool | Purpose | Price |
