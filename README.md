@@ -1,6 +1,7 @@
 # Kronos by ForgeMesh MCP
 
 [![M8ven Verified](https://m8ven.ai/badge/mcp/forgemeshlabs-kronos-forgemesh-mcp-1dod5h?variant=verified)](https://m8ven.ai/mcp/forgemeshlabs-kronos-forgemesh-mcp-1dod5h)
+[![mcpservers.org](https://mcpservers.org/badge.svg)](https://mcpservers.org/servers/forgemeshlabs/kronos-forgemesh-mcp)
 
 An MCP stdio server that lets agents purchase structured Kronos market
 intelligence from `https://kronos.forgemesh.io` using x402 USDC payments on
