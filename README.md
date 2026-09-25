@@ -29,6 +29,20 @@ advice, no support of any kind.
 | `check_kronos_preflight` | Conditions check before journaling | $0.05 |
 | `audit_kronos_decision` | Outcome audit for a prior `decision_id` | $0.07 |
 | `create_kronos_decision` | Auditable market-intelligence journal | $0.15 |
+| `get_kronos_perp_funding` | **Futures.** Live perp funding, mark/index, open interest, crowding (Kraken Futures + Hyperliquid) | $0.02 |
+| `check_kronos_futures_risk` | **Futures.** Will this side / leverage / entry survive the calibrated range? Liquidation distance + verdict | $0.05 |
+| `get_kronos_futures_decision` | **Futures.** LONG / SHORT / FLAT with stop and target on the calibrated range, leverage cap, liquidation price, sizing, funding cost | $0.15 |
+
+### Kronos Futures (new in 0.2.0)
+
+The three futures tools turn a bearish Kronos signal into a sized short instead
+of "stay out". Direction comes from the same spot signal; stop and target sit on
+the conformally calibrated 80% range; leverage is capped so liquidation stays
+outside twice the stop distance and never exceeds the Kronos risk state
+(NORMAL 3x, ELEVATED 2x, HIGH 1x, absolute 5x). Funding is read live from
+Kraken Futures and Hyperliquid. No exchange execution ever happens; the output
+is market intelligence, not a trade instruction. Leverage multiplies losses and
+adds liquidation risk.
 
 ## Install
 
@@ -58,7 +72,7 @@ production API origin.
 ```
 
 No payment occurs when the server starts or lists its tools. Payment happens
-only when an agent invokes one of the eight tools.
+only when an agent invokes one of the eleven tools.
 
 Unpaid challenge requests time out after 30 seconds; paid retries time out
 after 60 seconds. Errors are returned as structured `KRONOS_TOOL_ERROR`

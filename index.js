@@ -131,7 +131,72 @@ const TOOLS = [
       },
     },
   },
+  {
+    name: "get_kronos_futures_decision",
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+    description: "Kronos Futures: perpetual-futures decision package for a symbol. Direction LONG / SHORT / FLAT from the Kronos signal, stop-loss and take-profit on the calibrated 80% range, leverage cap keeping liquidation outside 2x the stop, liquidation price, risk-based position size for your equity, and live perp funding cost. Market intelligence only; no exchange execution. Costs $0.15 USDC.",
+    inputSchema: {
+      type: "object", additionalProperties: false,
+      properties: {
+        symbol: { type: "string", enum: ["BTC", "ETH", "SOL", "XRP", "ADA"] },
+        equity: { type: "number", minimum: 0, description: "Account equity in USD for position sizing (optional)." },
+        max_loss_pct: { type: "number", minimum: 0.0005, maximum: 0.2, default: 0.01, description: "Max loss per position as a fraction of equity." },
+        max_leverage: { type: "number", minimum: 1, maximum: 5, default: 5, description: "Your own leverage ceiling." },
+      },
+      required: ["symbol"],
+    },
+  },
+  {
+    name: "get_kronos_perp_funding",
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+    description: "Kronos Futures: live perpetual funding rates (1h, 8h, annualized), mark and index price, open interest, and a LONG_CROWDED / SHORT_CROWDED / BALANCED crowding label for BTC, ETH, SOL, XRP, and ADA from Kraken Futures and Hyperliquid. Costs $0.02 USDC.",
+    inputSchema: {
+      type: "object", additionalProperties: false,
+      properties: { symbol: { type: "string", enum: ["BTC", "ETH", "SOL", "XRP", "ADA"], description: "Optional single symbol; omit for all five." } },
+    },
+  },
+  {
+    name: "check_kronos_futures_risk",
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+    description: "Kronos Futures: will a leveraged perp position survive the calibrated range? Returns liquidation price and distance, the adverse range bound, a SURVIVES_RANGE / THIN_BUFFER / LIQUIDATION_INSIDE_RANGE verdict, the max leverage that still survives, P&L at both range bounds, and funding cost. Costs $0.05 USDC.",
+    inputSchema: {
+      type: "object", additionalProperties: false,
+      properties: {
+        symbol: { type: "string", enum: ["BTC", "ETH", "SOL", "XRP", "ADA"], default: "BTC" },
+        side: { type: "string", enum: ["LONG", "SHORT"] },
+        leverage: { type: "number", minimum: 1, maximum: 125 },
+        entry: { type: "number", minimum: 0, description: "Entry price; defaults to current perp mark." },
+        notional: { type: "number", minimum: 0, description: "Position notional in USD for funding cost (optional)." },
+        horizon_hours: { type: "integer", minimum: 1, maximum: 168, description: "Hours held for funding cost; defaults to the forecast horizon." },
+      },
+      required: ["side", "leverage"],
+    },
+  },
 ];
+
+function futuresQuery(args, keys) {
+  const parts = [];
+  for (const key of keys) {
+    if (args[key] === undefined || args[key] === null || args[key] === "") continue;
+    parts.push(`${key}=${encodeURIComponent(String(args[key]))}`);
+  }
+  return parts.length ? `?${parts.join("&")}` : "";
+}
 
 function buildToolPath(name, args = {}) {
   switch (name) {
@@ -143,6 +208,9 @@ function buildToolPath(name, args = {}) {
     case "create_kronos_decision": return `/api/kronos/decision?symbol=${encodeURIComponent(args.symbol)}`;
     case "audit_kronos_decision": return `/api/kronos/audit?decision_id=${encodeURIComponent(args.decision_id)}&window=${encodeURIComponent(args.window || "4h")}`;
     case "get_kronos_whale_flows": return `/api/whale?chain=${encodeURIComponent(args.chain || "base")}&hours=${Number(args.hours || 4)}`;
+    case "get_kronos_futures_decision": return `/api/kronos/futures/decision${futuresQuery(args, ["symbol", "equity", "max_loss_pct", "max_leverage"])}`;
+    case "get_kronos_perp_funding": return `/api/kronos/futures/funding${futuresQuery(args, ["symbol"])}`;
+    case "check_kronos_futures_risk": return `/api/kronos/futures/risk${futuresQuery(args, ["symbol", "side", "leverage", "entry", "notional", "horizon_hours"])}`;
     default: throw new Error(`Unknown tool: ${name}`);
   }
 }
@@ -210,7 +278,7 @@ async function callPaid(httpClient, path) {
 async function main() {
   let paymentClient;
   const getPaymentClient = () => paymentClient || (paymentClient = buildPaymentClient());
-  const server = new Server({ name: "kronos-forgemesh-mcp", version: "0.1.0" }, { capabilities: { tools: {} } });
+  const server = new Server({ name: "kronos-forgemesh-mcp", version: "0.2.0" }, { capabilities: { tools: {} } });
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: TOOLS }));
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
