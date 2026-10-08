@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { TOOLS, buildToolPath, validateApiUrl } = require("../index");
+const { TOOLS, buildToolPath, validateArgs } = require("../index");
 
 test("tool contracts have unique verb-first names and object schemas", () => {
   assert.equal(TOOLS.length, 11);
@@ -26,8 +26,12 @@ test("tool arguments map to canonical Kronos routes", () => {
   assert.equal(buildToolPath("check_kronos_futures_risk", { side: "LONG", leverage: 10, notional: 2000 }), "/api/kronos/futures/risk?side=LONG&leverage=10&notional=2000");
 });
 
-test("outbound origin is allowlisted", () => {
-  assert.equal(validateApiUrl("https://kronos.forgemesh.io"), "https://kronos.forgemesh.io");
-  assert.throws(() => validateApiUrl("https://example.com"), /must use/);
+test("arguments are validated before any network call", () => {
+  assert.doesNotThrow(() => validateArgs("get_kronos_forecast", { symbol: "ETH" }));
+  assert.throws(() => validateArgs("get_kronos_forecast", { symbol: "DOGE" }), /one of/);
+  assert.throws(() => validateArgs("audit_kronos_decision", { decision_id: "../x" }), /unexpected characters/);
+  assert.throws(() => validateArgs("get_kronos_history", { hours: 9999 }), /maximum/);
+  assert.throws(() => validateArgs("check_kronos_preflight", {}), /Missing required/);
+  assert.throws(() => validateArgs("get_kronos_risk", { extra: 1 }), /Unexpected/);
 });
 

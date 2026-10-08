@@ -55,6 +55,16 @@ authorizations. Use a dedicated low-balance Base wallet; never use a primary
 wallet. The server allowlists `https://kronos.forgemesh.io` as its only
 production API origin.
 
+## Requirements
+
+Node.js 20+ and a dedicated, low-balance Base wallet funded with USDC
+(`WALLET_PRIVATE_KEY`). The server refuses to sign for any payee other than
+the Kronos wallet, any network other than Base mainnet, any asset other than
+USDC, or any amount over the cap ($0.15 per call, $10 per session). The env
+vars `X402_MAX_PRICE_USD` and `X402_SESSION_BUDGET_USD` can only lower those
+caps. Requests are same-origin, time out after 60 seconds, are capped at 2 MB,
+and never follow redirects.
+
 ## Claude Code / Desktop
 
 ```json
@@ -74,8 +84,7 @@ production API origin.
 No payment occurs when the server starts or lists its tools. Payment happens
 only when an agent invokes one of the eleven tools.
 
-Unpaid challenge requests time out after 30 seconds; paid retries time out
-after 60 seconds. Errors are returned as structured `KRONOS_TOOL_ERROR`
+Errors are returned as structured `KRONOS_TOOL_ERROR`
 payloads so the calling agent can recover without reading server logs.
 
 Market intelligence only. Outputs are not instructions to transact.

@@ -8,12 +8,16 @@ const { x402Client, x402HTTPClient } = require("@x402/core/client");
 const { ExactEvmScheme } = require("@x402/evm/exact/client");
 const { toClientEvmSigner } = require("@x402/evm");
 const { privateKeyToAccount } = require("viem/accounts");
-const { createPublicClient, http } = require("viem");
-const { base } = require("viem/chains");
+const { createGuard } = require("./x402-guard");
 
-const API_URL = String(process.env.KRONOS_API_URL || "https://kronos.forgemesh.io").replace(/\/$/, "");
-const BASE_RPC_URL = process.env.BASE_RPC_URL || "https://mainnet.base.org";
 const ALLOWED_API_ORIGIN = "https://kronos.forgemesh.io";
+// Highest listed price is $0.15; the guard refuses to sign for any other payee, network, asset, or higher amount.
+const guard = createGuard({
+  baseUrl: ALLOWED_API_ORIGIN,
+  payTo: ["0x1CcEf327b34853f6aC51464eA47fb3c291328D5E"],
+  maxPriceUsd: 0.15,
+  sessionBudgetUsd: 10,
+});
 
 const TOOLS = [
   {
@@ -108,7 +112,7 @@ const TOOLS = [
     inputSchema: {
       type: "object", additionalProperties: false,
       properties: {
-        decision_id: { type: "string", minLength: 1, description: "decision_id returned by create_kronos_decision." },
+        decision_id: { type: "string", minLength: 1, maxLength: 128, pattern: "^[A-Za-z0-9._-]+$", description: "decision_id returned by create_kronos_decision." },
         window: { type: "string", enum: ["1h", "4h", "24h"], default: "4h" },
       },
       required: ["decision_id"],
@@ -215,76 +219,49 @@ function buildToolPath(name, args = {}) {
   }
 }
 
-function validateApiUrl(url) {
-  const parsed = new URL(url);
-  if (parsed.origin !== ALLOWED_API_ORIGIN) throw new Error(`KRONOS_API_URL must use ${ALLOWED_API_ORIGIN}`);
-  return parsed.origin;
-}
-
 function buildPaymentClient() {
   const key = process.env.WALLET_PRIVATE_KEY;
   if (!key) throw new Error("WALLET_PRIVATE_KEY is required; use a dedicated low-balance Base wallet funded with USDC");
   if (!/^(0x)?[0-9a-fA-F]{64}$/.test(key)) throw new Error("WALLET_PRIVATE_KEY must be a 32-byte hexadecimal private key");
   const account = privateKeyToAccount(key.startsWith("0x") ? key : `0x${key}`);
-  const client = new x402Client().register("eip155:*", new ExactEvmScheme(toClientEvmSigner(account)));
+  const client = new x402Client().register("eip155:*", new ExactEvmScheme(toClientEvmSigner(account))).registerPolicy(guard.policy);
   return new x402HTTPClient(client);
 }
 
-async function createChainTimedPayload(httpClient, paymentRequired) {
-  try {
-    const publicClient = createPublicClient({ chain: base, transport: http(BASE_RPC_URL) });
-    const chainNow = Number((await publicClient.getBlock()).timestamp);
-    const originalNow = Date.now;
-    const localNow = Math.floor(originalNow() / 1000);
-    const timeout = Number(paymentRequired.accepts?.[0]?.maxTimeoutSeconds || 300);
-    const signingNow = Math.min(Math.max(chainNow, localNow + 30 - timeout), chainNow + 600);
-    Date.now = () => signingNow * 1000;
-    try { return await httpClient.createPaymentPayload(paymentRequired); }
-    finally { Date.now = originalNow; }
-  } catch (_) {
-    return httpClient.createPaymentPayload(paymentRequired);
+// Validate arguments against the tool's own inputSchema before any network call or payment.
+function validateArgs(name, args) {
+  const tool = TOOLS.find((t) => t.name === name);
+  if (!tool) throw new Error(`Unknown tool: ${name}`);
+  if (args === null || typeof args !== "object" || Array.isArray(args)) throw new Error("arguments must be an object");
+  const props = tool.inputSchema.properties || {};
+  for (const key of Object.keys(args)) if (!props[key]) throw new Error(`Unexpected argument: ${key}`);
+  for (const key of tool.inputSchema.required || []) if (args[key] === undefined) throw new Error(`Missing required argument: ${key}`);
+  for (const [key, spec] of Object.entries(props)) {
+    const v = args[key];
+    if (v === undefined) continue;
+    if (spec.type === "string") {
+      if (typeof v !== "string" || v.length < (spec.minLength || 0) || v.length > (spec.maxLength || 2000)) throw new Error(`Invalid ${key}: expected string of valid length`);
+      if (spec.enum && !spec.enum.includes(v)) throw new Error(`Invalid ${key}: must be one of ${spec.enum.join(", ")}`);
+      if (spec.pattern && !new RegExp(spec.pattern).test(v)) throw new Error(`Invalid ${key}: unexpected characters`);
+    } else if (spec.type === "integer" || spec.type === "number") {
+      if (typeof v !== "number" || !Number.isFinite(v) || (spec.type === "integer" && !Number.isInteger(v))) throw new Error(`Invalid ${key}: expected ${spec.type}`);
+      if (spec.minimum !== undefined && v < spec.minimum) throw new Error(`Invalid ${key}: minimum is ${spec.minimum}`);
+      if (spec.maximum !== undefined && v > spec.maximum) throw new Error(`Invalid ${key}: maximum is ${spec.maximum}`);
+    }
   }
-}
-
-async function callPaid(httpClient, path) {
-  const origin = validateApiUrl(API_URL);
-  const url = `${origin}${path}`;
-  const response = await fetch(url, { signal: AbortSignal.timeout(30_000) });
-  if (response.status !== 402) {
-    if (!response.ok) throw new Error(`Kronos API returned HTTP ${response.status}`);
-    return response.json();
-  }
-
-  let responseBody;
-  try { responseBody = await response.clone().json(); } catch (_) {}
-  const required = httpClient.getPaymentRequiredResponse((header) => response.headers.get(header), responseBody);
-  const payload = await createChainTimedPayload(httpClient, required);
-  const paid = await fetch(url, {
-    headers: httpClient.encodePaymentSignatureHeader(payload),
-    signal: AbortSignal.timeout(60_000),
-  });
-  if (!paid.ok) {
-    const body = await paid.text().catch(() => "");
-    throw new Error(`Paid Kronos request returned HTTP ${paid.status}: ${body.slice(0, 240)}`);
-  }
-  const data = await paid.json();
-  try {
-    const settlement = httpClient.getPaymentSettleResponse((header) => paid.headers.get(header));
-    if (settlement && data && typeof data === "object" && !Array.isArray(data)) return { ...data, _payment: settlement };
-  } catch (_) {}
-  return data;
 }
 
 async function main() {
   let paymentClient;
   const getPaymentClient = () => paymentClient || (paymentClient = buildPaymentClient());
-  const server = new Server({ name: "kronos-forgemesh-mcp", version: "0.2.1" }, { capabilities: { tools: {} } });
+  const server = new Server({ name: "kronos-forgemesh-mcp", version: require("./package.json").version }, { capabilities: { tools: {} } });
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: TOOLS }));
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     try {
       const args = request.params.arguments || {};
-      const data = await callPaid(getPaymentClient(), buildToolPath(request.params.name, args));
+      validateArgs(request.params.name, args);
+      const data = await guard.callPaid(getPaymentClient(), buildToolPath(request.params.name, args));
       return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
     } catch (error) {
       return {
@@ -303,4 +280,4 @@ if (require.main === module) main().catch((error) => {
   process.exit(1);
 });
 
-module.exports = { TOOLS, buildToolPath, validateApiUrl };
+module.exports = { TOOLS, buildToolPath, validateArgs };
