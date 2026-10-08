@@ -6,12 +6,12 @@
     "url": "https://github.com/forgemeshlabs/kronos-forgemesh-mcp",
     "source": "github"
   },
-  "version": "0.2.0",
+  "version": "0.2.1",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@forgemeshlabs/kronos-forgemesh-mcp",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "transport": {
         "type": "stdio"
       },

@@ -278,7 +278,7 @@ async function callPaid(httpClient, path) {
 async function main() {
   let paymentClient;
   const getPaymentClient = () => paymentClient || (paymentClient = buildPaymentClient());
-  const server = new Server({ name: "kronos-forgemesh-mcp", version: "0.2.0" }, { capabilities: { tools: {} } });
+  const server = new Server({ name: "kronos-forgemesh-mcp", version: "0.2.1" }, { capabilities: { tools: {} } });
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: TOOLS }));
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
