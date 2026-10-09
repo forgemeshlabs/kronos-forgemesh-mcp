@@ -17,6 +17,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Wait for the npm release to be visible
+        # The registry validates the npm version named in server.json; a tag pushed right
+        # after `npm publish` can beat npm's propagation (0.2.1 and 0.2.2 failed this way).
+        run: |
+          PKG=$(node -p "require('./package.json').name")
+          VER=$(node -p "require('./package.json').version")
+          for i in $(seq 1 30); do
+            if npm view "$PKG@$VER" version >/dev/null 2>&1; then echo "$PKG@$VER is on npm"; exit 0; fi
+            echo "waiting for $PKG@$VER on npm ($i/30)"; sleep 20
+          done
+          echo "$PKG@$VER never appeared on npm"; exit 1
+
       - name: Install MCP publisher
         run: |
           curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" | tar xz mcp-publisher
