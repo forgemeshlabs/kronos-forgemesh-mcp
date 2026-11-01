@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.3
+
+- Dependencies: lockfile refresh resolving the open npm advisories (zod via @x402/core, body-parser, fast-uri, qs, ip-address, @hono/node-server as applicable). No behavior change.
+
 ## 0.2.0 — 2026-09-25
 
 - Added the Kronos Futures tools: `get_kronos_futures_decision` ($0.15), `get_kronos_perp_funding` ($0.02), `check_kronos_futures_risk` ($0.05) over the new `/api/kronos/futures/*` routes.
