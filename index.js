@@ -28,7 +28,7 @@ const TOOLS = [
       idempotentHint: false,
       openWorldHint: true,
     },
-    description: "Get current Kronos signal context and ranked symbols for BTC, ETH, SOL, XRP, and ADA. Costs $0.05 USDC.",
+    description: "Crypto trading signals (Kronos): latest signal scores and ranked symbols for BTC, ETH, SOL, XRP and ADA, with regime and data freshness. Costs $0.05 USDC.",
     inputSchema: { type: "object", additionalProperties: false, properties: {} },
   },
   {
@@ -39,7 +39,7 @@ const TOOLS = [
       idempotentHint: false,
       openWorldHint: true,
     },
-    description: "Get current Kronos market-risk state, signal streaks, and cooldown context. Costs $0.02 USDC.",
+    description: "Crypto market risk state (Kronos): current risk state, signal streaks and cooldown context. Costs $0.02 USDC.",
     inputSchema: { type: "object", additionalProperties: false, properties: {} },
   },
   {
@@ -50,7 +50,7 @@ const TOOLS = [
       idempotentHint: false,
       openWorldHint: true,
     },
-    description: "Get up to 168 hours of timestamped Kronos signal history for analysis and audit support. Costs $0.05 USDC.",
+    description: "Crypto signal history (Kronos): up to 168 hours of timestamped signal snapshots for analysis and audit support. Costs $0.05 USDC.",
     inputSchema: {
       type: "object", additionalProperties: false,
       properties: { hours: { type: "integer", minimum: 1, maximum: 168, default: 24, description: "History window in hours." } },
@@ -64,7 +64,7 @@ const TOOLS = [
       idempotentHint: false,
       openWorldHint: true,
     },
-    description: "Get a conformally calibrated 80% price range, current price, and upside probability for a supported symbol. Costs $0.05 USDC.",
+    description: "Crypto price forecast (Kronos): conformally calibrated 80% price range, current price and upside probability for a supported symbol. Costs $0.05 USDC.",
     inputSchema: {
       type: "object", additionalProperties: false,
       properties: { symbol: { type: "string", enum: ["BTC", "ETH", "SOL", "XRP", "ADA"], default: "BTC" } },
@@ -78,7 +78,7 @@ const TOOLS = [
       idempotentHint: false,
       openWorldHint: true,
     },
-    description: "Check market state, cooldowns, freshness, and warnings before creating a Kronos decision journal. Costs $0.05 USDC.",
+    description: "Crypto market preflight (Kronos): checks market state, cooldowns, freshness and warnings before creating a decision journal. Costs $0.05 USDC.",
     inputSchema: {
       type: "object", additionalProperties: false,
       properties: { symbol: { type: "string", enum: ["BTC", "ETH", "SOL", "XRP", "ADA"] } },
@@ -93,7 +93,7 @@ const TOOLS = [
       idempotentHint: false,
       openWorldHint: true,
     },
-    description: "Create an auditable Kronos market-intelligence journal entry with directional bias, calibrated confidence, and decision_id. Costs $0.15 USDC.",
+    description: "Crypto decision journal (Kronos): an auditable market-intelligence journal entry with directional bias, calibrated confidence and decision_id. Costs $0.15 USDC.",
     inputSchema: {
       type: "object", additionalProperties: false,
       properties: { symbol: { type: "string", enum: ["BTC", "ETH", "SOL", "XRP", "ADA"] } },
@@ -108,7 +108,7 @@ const TOOLS = [
       idempotentHint: false,
       openWorldHint: true,
     },
-    description: "Audit a prior Kronos decision_id against later prices and return its outcome verdict. Costs $0.07 USDC.",
+    description: "Decision outcome audit (Kronos): audits a prior decision_id against later prices and returns its outcome verdict. Costs $0.07 USDC.",
     inputSchema: {
       type: "object", additionalProperties: false,
       properties: {
@@ -126,7 +126,7 @@ const TOOLS = [
       idempotentHint: false,
       openWorldHint: true,
     },
-    description: "Get whale, exchange, bridge, and stablecoin-flow context for Ethereum, Base, or Arbitrum. Costs $0.02 USDC.",
+    description: "Whale alerts (Kronos): large exchange, bridge and stablecoin-issuer flows at monitored addresses on Ethereum, Base or Arbitrum, each with event type, source, amount and timestamp. Costs $0.02 USDC.",
     inputSchema: {
       type: "object", additionalProperties: false,
       properties: {
@@ -143,7 +143,7 @@ const TOOLS = [
       idempotentHint: false,
       openWorldHint: true,
     },
-    description: "Kronos Futures: perpetual-futures decision package for a symbol. Direction LONG / SHORT / FLAT from the Kronos signal, stop-loss and take-profit on the calibrated 80% range, leverage cap keeping liquidation outside 2x the stop, liquidation price, risk-based position size for your equity, and live perp funding cost. Market intelligence only; no exchange execution. Costs $0.15 USDC.",
+    description: "Perpetual futures decision (Kronos Futures): perpetual-futures decision package for a symbol. Direction LONG / SHORT / FLAT from the Kronos signal, stop-loss and take-profit on the calibrated 80% range, leverage cap keeping liquidation outside 2x the stop, liquidation price, risk-based position size for your equity, and live perp funding cost. Market intelligence only; no exchange execution. Costs $0.15 USDC.",
     inputSchema: {
       type: "object", additionalProperties: false,
       properties: {
@@ -163,7 +163,7 @@ const TOOLS = [
       idempotentHint: false,
       openWorldHint: true,
     },
-    description: "Kronos Futures: live perpetual funding rates (1h, 8h, annualized), mark and index price, open interest, and a LONG_CROWDED / SHORT_CROWDED / BALANCED crowding label for BTC, ETH, SOL, XRP, and ADA from Kraken Futures and Hyperliquid. Costs $0.02 USDC.",
+    description: "Perpetual funding rates (Kronos Futures): live perpetual funding rates (1h, 8h, annualized), mark and index price, open interest, and a LONG_CROWDED / SHORT_CROWDED / BALANCED crowding label for BTC, ETH, SOL, XRP, and ADA from Kraken Futures and Hyperliquid. Costs $0.02 USDC.",
     inputSchema: {
       type: "object", additionalProperties: false,
       properties: { symbol: { type: "string", enum: ["BTC", "ETH", "SOL", "XRP", "ADA"], description: "Optional single symbol; omit for all five." } },
@@ -177,7 +177,7 @@ const TOOLS = [
       idempotentHint: false,
       openWorldHint: true,
     },
-    description: "Kronos Futures: will a leveraged perp position survive the calibrated range? Returns liquidation price and distance, the adverse range bound, a SURVIVES_RANGE / THIN_BUFFER / LIQUIDATION_INSIDE_RANGE verdict, the max leverage that still survives, P&L at both range bounds, and funding cost. Costs $0.05 USDC.",
+    description: "Liquidation risk check (Kronos Futures): will a leveraged perp position survive the calibrated range? Returns liquidation price and distance, the adverse range bound, a SURVIVES_RANGE / THIN_BUFFER / LIQUIDATION_INSIDE_RANGE verdict, the max leverage that still survives, P&L at both range bounds, and funding cost. Costs $0.05 USDC.",
     inputSchema: {
       type: "object", additionalProperties: false,
       properties: {
