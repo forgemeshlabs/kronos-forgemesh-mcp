@@ -6,5 +6,5 @@
   "name": "Kronos by ForgeMesh",
   "description": "Auditable crypto market intelligence with calibrated ranges, risk context, decision journals, outcome audits, and x402 payments on Base",
   "transport": "stdio",
-  "version": "0.2.5"
+  "version": "0.2.6"
 }
